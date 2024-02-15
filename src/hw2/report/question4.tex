@@ -1,0 +1,207 @@
+\section{The Perceptron Algorithm and its Variants}\label{sec:q4}
+
+For this question, you will experiment with the Perceptron algorithm
+and some variants on a data set.
+
+\subsection{The task and data}
+
+We will be using the Diabetic Retinopathy dataset from the UCI
+Machine Learning
+repository~\footnote{\url{https://archive.ics.uci.edu/ml/datasets/Diabetic+Retinopathy+Debrecen+Data+Set}}. The
+dataset consists of features extracted from images and the goal is
+to predict whether an image contains signs of diabetic retinopathy
+or not. Using this labeled data, we want to build a classifier that
+identifies whether a new retinal image shows signs of diabetic
+retinopathy or not.
+
+The data has been preprocessed into the same format we used for the previous homework.  Use the
+training/development/test files called {\tt diabetes.train.csv}, {\tt
+  diabetes.dev.csv} and {\tt diabetes.test.csv}.  For details about the data format, check README.txt in the dataset file provided to you.
+\subsection{Algorithms}
+
+You will implement several variants of the Perceptron algorithm. Note
+that each variant has different hyper-parameters, as described
+below. Use 5-fold cross-validation to identify the best
+hyper-parameters as you did in the previous homework. To help with
+this, we have split the training set into five parts {\tt
+  train0.data.csv}--{\tt train4.data.csv} in the folder {\tt
+  CVSplits}.
+
+\begin{enumerate}
+\item \textbf{Simple Perceptron:} Implement the simple batch version
+  of Perceptron as described in the class. Use a fixed learning rate
+  $\eta$ chosen from $\{1,0.1,0.01\}$. An update will be performed on
+  an example $(\bx, y)$ if $y(\bw^T\bx + b) < 0$ as:
+  \begin{itemize}
+  \item[] $\bw \leftarrow \bw + \eta y \bx$,
+  \item[] $b \leftarrow b + \eta y$.
+  \end{itemize}
+
+  \textbf{Hyper-parameter:} Learning rate $\eta\in\{1,0.1,0.01\}$
+
+  Two things bear additional explanation. 
+
+  \begin{enumerate}
+  \item First, note that in the formulation above, the bias term $b$
+    is explicitly mentioned. This is because the features in the data
+    do not include a bias feature. Of course, you could choose to add
+    an additional constant feature to each example and not have the
+    explicit extra $b$ during learning. (See the class lectures for
+    more information.) However, here, we will see the version of
+    Perceptron that explicitly has the bias term.
+  \item Second, in this specific case, if $\bw$ and $b$ are
+    initialized with zero, then the fixed learning rate will have no
+    effect. To see this, recall the Perceptron update from above.
+    
+    Now, if $\bw$ and $b$ are initialized with zeroes and a fixed
+    learning rate $\eta$ is used, then we can show that the final
+    parameters will be equivalent to having a learning rate $1$. The
+    final weight vector and the bias term will be scaled by $\eta$
+    compared to the unit learning rate case, which does not affect the
+    sign of $\bw^T\bx + b$.
+    
+    To avoid this, you should initialize the all elements of the
+    weight vector $\bw$ and the bias to a small random number between
+    -0.01 and 0.01.
+    
+  \end{enumerate}
+
+\item \textbf{Decaying the learning rate:} Instead of fixing the
+  learning rate, implement a version of the Perceptron algorithm
+  whose learning rate decreases as $\frac{\eta_0}{1+t}$, where
+  $\eta_0$ is the starting learning rate, and $t$ is the time
+  step. Note that $t$ should keep increasing across epochs. (That
+  is, you should initialize $t$ to $0$ at the start and keep
+  incrementing it after each epoch.)
+
+  \textbf{Hyper-parameter:} Initial learning rate
+  $\eta_0\in \{1,0.1,0.01\}$
+
+\item \textbf{Margin Perceptron:} This variant of Perceptron will
+  perform an update on an example $(\bx, y)$ if
+  $y(\bw^T\bx + b) < \mu$, where $\mu$ is an additional positive
+  hyper-parameter, specified by the user. Note that because $\mu$ is
+  positive, this algorithm can update the weight vector even when
+  the current weight vector does not make a mistake on the current
+  example.  You need to use the decreasing learning rate as before.
+
+  \textbf{Hyper-parameters:} 
+  \begin{enumerate}
+  \item Initial learning rate $\eta_0\in \{1,0.1,0.01\}$ 
+  \item Margin $\mu\in\{1,0.1,0.01\}$
+  \end{enumerate}
+
+  \textbf{Note:} When there is more than one hyper-parameter to
+  cross-validate, you need to consider all combinations of the
+  hyper-parameters. In this case, you will need to perform
+  cross-validation for all pairs $(\eta_0, \mu)$ from the above
+  sets.
+
+
+\item\textbf{Averaged Perceptron} Implement the averaged version of
+  the original Perceptron algorithm from the first question. Recall
+  from class that the averaged variant of the Perceptron asks you to
+  keep two weight vectors (and two bias terms). In addition to the
+  original parameters ($\bw, b$), you will need to update the averaged
+  weight vector $\ba$ and the averaged bias $b_a$ as:
+
+  \begin{enumerate}
+  \item $\ba \leftarrow \ba + \bw$
+  \item $b_a \leftarrow b_a + b$
+  \end{enumerate}
+  
+  This update should happen once for every example in every epoch,
+  {\em irrespective of whether the weights were updated or not for
+    that example}. In the end, the learning algorithm should return
+  the averaged weights and the averaged bias.
+
+  (Technically, this strategy can be used with any of the variants we
+  have seen here. For this homework, we only ask you to implement the
+  averaged version of the original Perceptron. However, you are
+  welcome to experiment with averaging the other variants.)
+
+\item {\bf Aggressive Perceptron with Margin, (For 6350 Students)}
+  This algorithm is an extension of the margin Perceptron and performs
+  an aggressive update as follows:
+
+  If $y(\bw^T \bx) \leq \mu$ then  \\
+  \null\quad\quad (a) Update $\bw_{new} \leftarrow \bw_{old} + \eta y\bx$
+
+
+  Unlike the standard Perceptron algorithm, here the learning
+  rate $\eta$ is given by
+
+  \begin{align*}
+    \eta = \frac{\mu - y(\bw^T \bx) }{\bx^T \bx +1}
+  \end{align*}
+
+  As with the margin Perceptron, there is an additional positive parameter $\mu$.
+
+  \paragraph{Explanation of the update.} We call this the aggressive update because the learning rate is derived from the following optimization problem:
+
+  When we see that $y(\bw^T \bx) \leq \mu$, we try to find new values of $\bw$ such that $y(\bw^T \bx) = \mu$ using
+  % 
+  \begin{eqnarray*}
+    \min_{\bw_{new}} &     \frac{1}{2} {||\textbf{$\bw_{new}$} - \textbf{$\bw_{old}$}||}^2\\
+    \mbox{such that} & y(\bw^T x) = \mu.
+  \end{eqnarray*}
+  % 
+  That is, the goal is to find the smallest change in the weights so that the current example is on the right side of the weight vector.
+
+  By substituting (a) from above into this optimization problem, we will get a single variable optimization problem whose solution gives us the $\eta$ defined above. You can think of this algorithm as trying to tune the weight vector so that the current example is correctly classified right after the update.
+
+  Implement this aggressive Perceptron algorithm.
+
+  \textbf{Hyper-parameters:} $\mu\in\{1,0.1,0.01\}$
+
+\end{enumerate}
+
+
+\subsection{Experiments}
+
+For all $5$ settings above ($4$ for undergraduate students), you need to do the following things:
+
+\begin{enumerate}
+\item Run cross validation for {\bf ten} epochs for each
+  hyper-parameter combination to get the best hyper-parameter
+  setting. Note that for cases when you are exploring combinations of
+  hyper-parameters (such as the margin Perceptron), you need to try
+  out all combinations.
+
+\item Train the classifier for {\bf 20} epochs. At the end of each
+  training epoch, you should measure the accuracy of the classifier on
+  the development set. For the averaged Perceptron, use the average
+  classifier to compute accuracy.
+
+\item Use the classifier from the epoch where the development set
+  accuracy is highest to evaluate on the test set.
+\end{enumerate}
+
+\subsection{What to report}
+
+\begin{enumerate}
+\item~[5 points] Briefly describe the design decisions that you have
+  made in your implementation. (E.g, what programming language, how do
+  you represent the vectors, etc.)
+\item~[2 points] {\em Majority baseline:} Consider a classifier that
+  always predicts the most frequent label. What is its accuracy on
+  test and development set?
+\item~[10 points per variant] For each variant above (5 for 6350 students, 4 for 5350 students), you need to report:
+  \begin{enumerate}
+  \item The best hyper-parameters
+  \item The cross-validation accuracy for the best hyperparameter 
+  \item The total number of updates the learning algorithm performs on the training set
+  \item Development set accuracy
+  \item Test set accuracy
+  \item Plot a {\em learning curve} where the $x$ axis is the epoch id
+    and the $y$ axis is the dev set accuracy using the classifier (or
+    the averaged classifier, as appropriate) at the end of that
+    epoch. Note that you should have selected the number of epochs
+    using the learning curve (but no more than 20 epochs).
+  \end{enumerate}
+\end{enumerate}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "hw2"
+%%% End:

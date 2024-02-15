@@ -167,3 +167,8 @@ cython_debug/
 # Quarto
 *.html
 *_files/
+
+# TexStudio files
+*.out
+*.aux
+*.gz

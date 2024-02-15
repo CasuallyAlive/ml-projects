@@ -1,0 +1,57 @@
+\section{Feature transformations}\label{sec:q2}
+
+[10 points] Consider the concept class $C$ consisting of functions $f_r$ defined by a radius $r$ as follows:
+
+\begin{equation*}
+            f_r(x_1,x_2) = \begin{cases}
+                +1 \quad 24x_1^{2024}-23x_2^{2023}\leq r \\
+                -1 \quad \text{otherwise}
+            \end{cases}
+            \label{eq-0}
+        \end{equation*}
+
+Note that the hypothesis class is \textit{not} linearly separable in $\mathbb{R}^2$.\\
+
+Construct a function $\phi(x_1,x_2)$ that maps examples to a new \emph{two-dimensional} space, such that the positive and negative examples are linearly separable in that space. The answer to this question should consist of two parts: 
+\begin{enumerate}
+\item A function $\phi$ that maps examples to a new space.
+\item A proof that in the new space, the positive and negative points are linearly separated. You can show this by producing such a hyperplane in the new space (i.e. find a weight vector \textbf{w} and a bias $b$ such that $\textbf{w}^T\phi(x_1,x_2)\geq b$ if, and only if, $f_r(x_1,x_2)=+1$.
+\end{enumerate}
+
+\begin{flushleft}
+Response:
+\end{flushleft}
+\begin{paragraph}
+	~Consider a feature transformation function $\phi(x1, x2)$ that when applied on $\textbf{x} = [x_1 \;\; x_2]^T$ results in $\textbf{z} = \phi(\textbf{x}) = [x_1^{2024} \;\; x_2^{2023}]^T$. Allow the variable $q$ to represent the result of the inequality $\textbf{w}^T \textbf{z} \geq b$. That is,
+	\begin{equation*}
+	q = \begin{cases} 
+		True \; (+1) \; \text{ if } \bw^T \bz \; \geq \; b \\
+		False \; (-1) \; \text{ if } \bw^T \bz \; < \; b
+		\end{cases} \text{, where } \bw = [-24 \;\; 23]^T \text{ and } b = -r
+	\end{equation*}
+	Furthermore, let the variable p be $True$ when $f_r(x_1, x_2) = +1$ and is parameterized by the inequality $24x_1^{2024} - 23x_2^{2023} \leq r$. By definition of linear separability, we must prove the double implication $q \iff p$ is true.
+	\begin{enumerate}
+		\item ~$\text{Prove } q \implies p$. \newline
+		Assume q to be true, then $q \coloneqq \bw^T \bz \; \geq \; b = +1$.\\
+		
+		Substituting $\bz$, $\bw$, and $b$. $$q \coloneqq [-24 \;\; 23] \begin{bmatrix}x_1^{2024} \\ x_2^{2023}\end{bmatrix} \geq -r$$
+		By definition of the inner product,
+			$$q \coloneqq -24x_1^{2024} + 23x_2^{2023} \geq -r$$
+		Dividing both sides of inequality by -1 and by flip rule of inequalities,
+			$$q \coloneqq 24x_1^{2024} - 23x_2^{2023} \leq r$$
+		Since $q \coloneqq \bw^T \bz \; \geq \; b = 24x_1^{2024} - 23x_2^{2023} \leq r = f_r(x_1, x_2)$ when $q$ is +1, then $p$ must also be true. 
+		
+		\item ~$\text{Prove } p \implies q$ \newline
+		Assume p to be true, then $p \coloneqq 24x_1^{2024} - 23x_2^{2023} \leq r = +1$.
+		Dividing both sides of inequality by -1 and by flip rule of inequalities,
+			$$p \coloneqq 24x_1^{2024} - 23x_2^{2023} \leq r$$
+		Thus, from a posteriori established in part 1, if $q \coloneqq \bw^T \bz \; \geq \; b = 24x_1^{2024} - 23x_2^{2023} \leq r$, then $q = +1$. So, $q$ must be true.
+	\end{enumerate}
+	We have proved that $q \implies p$ and $p \implies q$, therefore, $q \iff p$ must be true by definition of double implication. 
+\end{paragraph}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "hw2"
+%%% End:

@@ -1,0 +1,75 @@
+\section{Warmup: Boolean Functions}
+\label{sec:boolean-functions}
+
+\begin{enumerate}
+\item ~[3 points] Table \ref{tab:boolean-function-data-1} shows
+  several data points (the $x$'s) along with corresponding labels
+  ($y$). (That is, each row is an example with a label.) Write down
+  three different Boolean functions, all of which can produce the
+  label $y$ when given the inputs $x$.
+
+  \begin{table}[h]
+    \centering
+    \begin{tabular}{ccccc}
+      \toprule
+      y & $x1$ & $x2$ & $x3$ & $x4$ \\
+      \midrule
+      0 & 0    & 1    & 1    & 0    \\
+      0 & 1    & 1    & 1    & 0    \\
+      1 & 0    & 1    & 1    & 1    \\
+      \bottomrule
+    \end{tabular}
+    \caption{Initial data set}
+    \label{tab:boolean-function-data-1}
+  \end{table}
+  
+  Response:
+  \begin{enumerate}
+  	\item ~$y_1 = (x_2 \xor x_3) \; \lor x_4$
+  	\item ~$y_2 = (x_2 \lor x_3) \; \land x_4$
+  	\item ~$y_3 = x_4$
+  \end{enumerate}
+  
+  
+\item ~[5 points] Now the Table \ref{tab:boolean-function-data-1} is
+  expanded to Table \ref{tab:boolean-function-data-2} by adding more
+  data points. How many errors will each of your functions from the
+  previous questions make on the expanded data set.
+
+  \begin{table}[h]
+    \centering
+    \begin{tabular}{ccccc}
+      \toprule
+      $y$ & $x1$ & $x2$ & $x3$ & $x4$ \\
+      \midrule
+      0 & 0    & 1    & 1    & 0    \\
+      0 & 1    & 1    & 1    & 0    \\
+      1 & 0    & 1    & 1    & 1    \\
+      1 & 1    & 0    & 1    & 1    \\
+      0 & 0    & 1    & 1    & 0    \\
+      1 & 1    & 1    & 0    & 1    \\
+      \bottomrule
+    \end{tabular}
+    \caption{Expanded data set}
+    \label{tab:boolean-function-data-2}
+  \end{table}
+  
+  Response:
+  \begin{enumerate}
+  	\item ~The function $y_1$ has 0 errors given the expanded data set, since new features where the term $z = x2 \xor x3$ is always true when the output is true. The same is true for $z \lor x_4$.
+  	\item ~The function $y_2$ has 0 errors given the expanded data set. It is clear that $y$ is true whenever $x_4$ is true, so the $\land$ operator only outputs true if the following conditions are met, at least one of $x_2$ or $x_3$ are true and $x_4$ is true.
+ 	\item ~The function $y_3$ offers the simplest solution since it reflects the value of $x_4$; furthermore, the function produces zero errors. 
+  \end{enumerate}
+\item ~[5 points] Is the function in Table
+  \ref{tab:boolean-function-data-2} linearly separable? If so, write
+  down a linear threshold function that classifies the data. If not,
+  prove that there is no linear threshold function that can classify
+  the data. \newline
+	
+  Response: The function that represents table 2 is linearly separable if the simplest solutions such as $y_3$ are considered. Replacing every $0$ label with $-1$ produces a function where the threshold is $y: x_4 >= 0$. 
+\end{enumerate}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "hw2"
+%%% End:

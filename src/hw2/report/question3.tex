@@ -1,0 +1,67 @@
+\section{Mistake Bound Model of Learning}\label{sec:q3}
+
+In both the questions below, we will consider functions defined over
+$n$ Boolean features. That is, each example in our learning problem
+is a $n$-dimensional vector from $\{0, 1\}^n$. We will use the
+symbol $\bx$ to denote an example and $\bx_i$ denotes its $i^{th}$
+element.  (We will assume that there is no noise involved.)
+
+For all questions below, it is not enough to just state the
+answer. You need to justify your answer with a short proof.
+
+
+\begin{enumerate}
+\item Consider the concept class $\mathcal{C}_1$ defined as follows:
+  Each element of $\mathcal{C}_1$ is defined using a fixed instance
+  $\bz \in \{0, 1\}^n$ as follows:
+  \begin{equation*}
+    f_\bz(\bx) = \begin{cases}
+      1 & \bx = \bz \\
+      0 & \bx \ne \bz.
+    \end{cases}
+  \end{equation*}
+  That is, the function $f_\bz$ predicts $1$ if, and only if, the
+  input to the function is $\bz$.
+
+  Our goal is to come up with a mistake bound algorithm that will
+  learn any function $f\in\mathcal{C}_1$.
+  
+  \begin{enumerate}
+  \item~[5 points] Determine $\vert\mathcal{C}_1\vert$, the size of
+    concept class.
+    
+  \item~[15 points] Write a mistake bound learning algorithm for
+    this concept class that makes no more than {\em one} mistake on
+    any sequence of examples presented to it. Please write the
+    algorithm concisely in the form of pseudocode.
+
+    Prove the mistake bound for this algorithm.
+
+  \end{enumerate}
+
+\item Suppose we have a concept class $\mathcal{C}_2$ that consists
+  of exactly $n$ functions $\{f_1, f_2, \cdots, f_n\}$, where each
+  function $f_i$ is defined as follows:
+  % 
+  \begin{equation*}
+    f_i(\bx) = \bx_i.
+  \end{equation*}
+  That is, the function $f_i$ returns the value of the $i^{th}$
+  feature.
+  
+  \begin{enumerate}
+  \item~[5 points] How many mistakes will the algorithm
+    \textbf{CON} from class make on any function from this concept
+    class?
+  \item~[5 points] How many mistakes will the Halving algorithm make
+    on any function from this concept class?
+  \end{enumerate}
+  
+\end{enumerate}
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "hw2"
+%%% End:
