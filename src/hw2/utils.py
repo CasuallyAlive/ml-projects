@@ -22,6 +22,15 @@ def get_data_comp(data, labels, null='?'):
     
     return x, y.flatten()
 
+def get_common_label(y):
+        p = len(np.where(y)[0])
+        p_ = len(np.where(~y)[0])
+        
+        return p > p_
+    
+def normalize(x, axis=1):
+    return x/np.max(x, axis=axis)
+
 def get_attribute_dict(features: pd.DataFrame, missing_names):
     A = list(features.columns)
     a_dict = {a : np.unique(features.loc[:, features.columns.isin([a])].to_numpy()).tolist() for a in A}
@@ -33,6 +42,12 @@ def get_attribute_dict(features: pd.DataFrame, missing_names):
 def get_null_columns(x: pd.DataFrame, null='?'):
     temp = (x == null).idxmax(axis=0)
     return list(temp.index[temp > 0])
+
+# Get all hyperparameter combinations
+def get_hp_combs(lrs, mus):
+    hyperparameters = np.array(np.meshgrid(lrs, mus, indexing='ij')).T
+    m, n, _ = hyperparameters.shape
+    return hyperparameters.reshape((m*n, 2))
 
 def fill_null(x:pd.DataFrame, null='?'):
     col_names = get_null_columns(x, null)
@@ -51,10 +66,11 @@ def insert_bias_term(x: Union[pd.DataFrame, np.ndarray], m):
     t = np.insert(t, 0, (np.zeros(shape=(m,))+1), axis=1)
     return t
 
-def five_fold_CV(k_datasets, labels, learning_rates, options):
+# Runs five fold CV on model.
+def five_fold_CV(k_datasets, labels, hyperparams, e, update_fnc, lr_fnc):
     K=5
-    cv_acc = {r : [] for r in learning_rates}
-    for r in learning_rates:
+    cv_acc = {tuple(hp) : [] for hp in hyperparams}
+    for r, mu in hyperparams:
         for k in range(K):
             k_ds = list(k_datasets)
 
@@ -68,9 +84,12 @@ def five_fold_CV(k_datasets, labels, learning_rates, options):
             data_train = pd.concat(k_ds)
             x_train, y_train = get_data_comp(data_train, labels=list(labels.values()))
 
-            pn = Perceptron(labels)
-            pn.train(data_train, epochs=options[0], r=r, decay=options[2])
+            pn = Perceptron(labels, update_fnc, lr_fnc)
+            pn.train(data_train, epochs=e, r=r, mu=mu)
 
-            cv_acc[r].append(calc_acc(pn.predict(x_val), y_val))
-            
-    return cv_acc
+            cv_acc[(r, mu)].append(pn.calc_acc(x_val, y_val))
+    
+    # average across all folds
+    cv_acc_stats = {tuple(hp) : (np.mean(trials), np.std(trials)) for hp, trials in cv_acc.items()}
+
+    return cv_acc_stats, cv_acc
