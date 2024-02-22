@@ -40,6 +40,14 @@ answer. You need to justify your answer with a short proof.
 
     Prove the mistake bound for this algorithm.
 
+	\textbf{Algorithm} CON (Consistent On Negatives) P: Set of all positive examples, N: Set of all negative examples\\
+	\hspace*{1cm} $h \leftarrow \begin{cases}
+		+1 \quad \text{positive example} \\
+		-1 \quad \text{negative example}
+	\end{cases}
+	\label{eq-0}$
+
+
   \end{enumerate}
 
 \item Suppose we have a concept class $\mathcal{C}_2$ that consists
@@ -56,8 +64,10 @@ answer. You need to justify your answer with a short proof.
   \item~[5 points] How many mistakes will the algorithm
     \textbf{CON} from class make on any function from this concept
     class?
+    Response: Since the function is a binary decision, then the hypothesis will make at most one mistake. The mistake is made on positive examples at most once because the algorithm corrects any mistake made on positive examples during iterations.
   \item~[5 points] How many mistakes will the Halving algorithm make
     on any function from this concept class?
+    Response: Once again, the outputs are $\in${0,1}, so the halving algorithm will make $\leq \; lg(\vert C \vert)$ mistakes.
   \end{enumerate}
   
 \end{enumerate}
