@@ -173,3 +173,7 @@ cython_debug/
 *.out
 *.aux
 *.gz
+
+# data files
+data/
+*.csv

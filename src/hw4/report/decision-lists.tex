@@ -1,0 +1,57 @@
+\section{Extra Credit - Decision Lists [25 points]}
+In this problem, we are going to learn the class of $k$-decision
+lists. A decision list is an ordered sequence of if-then-else
+statements. The sequence of if-then-else conditions are tested in
+order, and the answer associated to the first satisfied condition is
+output. See Figure~\ref{fig:decision_list} for an example of a
+$2$-decision list.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=1.35in]{fig-1.pdf}
+\caption{A $2$-decision list.}
+\label{fig:decision_list}
+\end{center}
+\end{figure}
+
+A {\em $k$-decision list} over the variables $x_{1}, \ldots, x_{n}$ is
+an ordered sequence $L=(c_{1}, b_{1}), \ldots, (c_{l},b_{l})$ and a
+bit $b$, in which each $c_{i}$ is a conjunction of at most $k$
+literals over $x_{1},\ldots, x_{n}$. The bit $b$ is called the {\em
+  default} value, and $b_{i}$ is referred to as the bit {\em
+  associated} with condition $c_{i}$. For any input $x \in \{0,
+1\}^{n}$, $L(x)$ is defined to be the bit $b_{j}$, where $j$ is the
+smallest index satisfying $c_{j}(x)=1$; if no such index exists, then
+$L(x)=b$.
+
+We denote by $k\mbox{\em -DL}$ the class of concepts that can be
+represented by a $k$-decision list.
+
+
+\begin{enumerate}
+\item \relax[8 points] Show that if a concept $c$ can be represented
+  as a $k$-decision list so can its complement, $\neg c$. You can show
+  this by providing a $k$-decision list that represents $\neg c$,
+  given $c = \{(c_{1},b_{1}), \ldots, (c_{l},b_{l}),b)$.
+
+	\textbf{Response:} By leveraging \textit{a priori} from Ron Rivest in \textit{Learning Decision Lists}, we come to find that the solution is trivial and involves a minute manipulation of the decision list (DL). The complement $\neg c$ can be derived by negating all the leaves of the DL due to $k$-DL trees being closed under complementation. So, $$\neg c = \{(c_{1},\neg b_{1}), \ldots, (c_{l},\neg b_{l}),\neg b)$$
+
+\item \relax[9 points] Use  Occam's Razor to show: \\
+  For any constant $k \geq 1$, the class of $k$-decision lists is
+  PAC-learnable. \newline\newline
+  \textbf{Response:} We know that $k$-DL is polynomial-sized, that is, $|k \text{-DL(n)}|=O(3^{|C^n _k|}(|C^n _k|)!)$, where $C^n _k$ is the set of all conjuctions of size at most $k$ with literals drawn from $L_n$. Furthermore, each term can either be paired with 1 or 0 or missing in arbitrary order. Taking the 2-base lg:
+  
+  $$lg|k \text{-DL(n)}|=lg(O(3^{|C^n _k|}(|C^n _k|)!))$$
+  Thus, for some constant $t$,
+  $$lg|k \text{-DL(n)}|=O(n^t)$$
+  Finally, we have shown that $k$-DL is PAC learnable in polynomial time for $k \geq 1$
+
+\item \relax[8 points] Show that $1$-decision lists are a linearly
+  separable functions. (Hint: Find a weight vector that will make the
+  same predictions a given $1$-decision list.) \newline
+  
+  \textbf{Response:} For instance, suppose we have a conjunctive clause $c = x_1 ^ \neg x_2$. Now, let's consider a weight vector $w$ such that $w^T x$ yields the decision $d$. We can set $w$ to be the same as the conjunction $c$ itself, treating the literals as weights. Specifically, if the literal appears positively in $c$, we assign $w_i=1$; if it appears negatively, we assign $w_i=-1$. So w = [1, -1] for $c$. $$d = w^T x=x_1 - \neg x_2$$
+	
+\end{enumerate}
+
+

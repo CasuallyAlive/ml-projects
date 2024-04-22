@@ -1,0 +1,21 @@
+\section{Shattering [15 points, for 6350 students]}
+\label{sec:shattering}
+
+Suppose we have a set $X_n$ consists of all binary sequences of a length $n$.
+For example, if $n=3$, the set would consist of the eight elements
+\texttt{\{000, 001, 010, 011, 100, 101, 110, 111\}}.
+
+Consider a set of functions $H_n$ that we will call the set of {\em
+  templates}. Each template is a sequence of length $n$ that is constructed
+using {\tt 0}, {\tt 1} or {\tt -} and returns $+1$ for input binary sequences
+that match it and $-1$ otherwise. While checking whether a template matches an
+input, a {\tt -} can match both a {\tt 0} and a {\tt 1}.
+
+For example, the template {\tt -10} matches the binary strings {\tt 010} and
+{\tt 110}, while {\tt -1-} matches all strings that have a {\tt 1} in the middle
+position, namely {\tt 010}, {\tt 011}, {\tt 110} and {\tt 111}.
+
+Does the set of templates $H_n$ shatter the set $X_n$? Prove your answer. \newline
+
+\textbf{Response:}
+Suppose set $X_3$ consists of all binary strings of length n=3. Then, $X_3=\{\{000\}, \{001\}, ...,\{111\}\}$ and $|X_3|=8$. As stated in the example above $\{-1-\}$ matches 010, 011, 110, and 111. This can be generalized to state that a template w/ $k$ unique dashes can match $2^k$ different binary strings in $X_n$. Lets assume that $H_n$ has at least as many elements as $X_n$. The maximum size $|H_n|$ is $3^n$ which is larger than the length of $X_n$ or $2^n$. Because one template can match $2^k$ different binary strings of length $n$, we can realistically ensure that the set of templates $H_n$ can shatter the set $X_n$.

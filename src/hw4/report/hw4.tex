@@ -1,0 +1,51 @@
+\documentclass[12pt, fullpage,letterpaper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{url}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{booktabs}
+\usepackage{pgfplotstable}
+\usepackage{tikz-cd}
+\usepackage{tikz}
+\usetikzlibrary{arrows, positioning}
+
+
+\newcommand{\semester}{Spring 2024}
+\newcommand{\assignmentId}{4}
+\newcommand{\releaseDate}{March 15, 2020}
+\newcommand{\dueDate}{March 29, 2020}
+
+\newcommand{\bx}{{\bf x}}
+\newcommand{\bw}{{\bf w}}
+\DeclareMathOperator{\sgn}{sgn}
+
+\pgfplotsset{my style/.append style={axis x line=middle, axis y line=
+middle, xlabel={$x$}, ylabel={$y$}, axis equal }}
+
+\title{CS 5350/6350, DS 4350: Machine Learning \semester}
+\author{Homework \assignmentId}
+  
+\begin{document}
+
+\maketitle
+\begin{center}
+	\text{Author: Jordy A. Larrea Rodriguez}
+\end{center}
+
+% \input{general-instructions}
+
+\input{depth-limited-decision-tree}
+
+\input{shattering}
+
+\input{vc-dimension}
+
+\input{decision-lists}
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
