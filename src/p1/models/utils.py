@@ -1,6 +1,8 @@
+import os, glob, re
 import numpy as np
 import pandas as pd
 from typing import Union
+from word2number.w2n import word_to_num
 
 def load_data(labels, null='?', dir=r"data/"):
     data = pd.read_csv(dir)
@@ -21,12 +23,35 @@ def get_data_comp(data, labels, null='?'):
     
     return x, y.flatten()
 
+def get_data_col(data: pd.DataFrame, colname:str):
+    x = data.loc[:, data.columns.isin([colname])]
+    return x.to_numpy()
+    
 def get_common_label(y):
         p = len(np.where(y)[0])
         p_ = len(np.where(~y)[0])
         
-        return p > p_, p
-    
+        cl = p > p_
+        return cl, p if cl else p_
+
+def get_num(words):
+    l=len(words)
+    r = re.compile(r'teenth')
+    for w in words:
+        if(str.isdigit(w)):
+            return int(w)
+        elif(r.search(w)):
+            return word_to_num(w[:-2])
+        elif(str.isdigit(w.strip('a'))):
+            return int(w.strip('a'))
+        else:
+            try:
+                num=word_to_num(w)
+            except:
+                continue
+            return num
+    return False    
+
 def normalize(x, axis=1):
     return x/np.max(x, axis=axis)
 
@@ -41,6 +66,32 @@ def get_attribute_dict(features: pd.DataFrame, missing_names):
 def get_null_columns(x: pd.DataFrame, null='?'):
     temp = (x == null).idxmax(axis=0)
     return list(temp.index[temp > 0])
+
+def get_attr_nums(data: pd.DataFrame, attr_id: str, uk:str):
+    x = get_data_col(data, attr_id)
+
+    dlen = len(x)
+
+    nums = []
+
+    non_ages_set = set(); non_ages_set.add(uk)
+    for i in range(dlen):
+        a = x[i][0].strip(' ')
+        # print(a)
+        if a == uk: nums.append(np.nan)
+        elif str.isdigit(a): 
+            num = int(a)        
+            nums.append(num)
+        elif get_num(re.sub("[^\w]", " ", a).split()):
+            num = get_num(re.sub("[^\w]", " ", a).split())        
+            nums.append(num)
+        else: 
+            nums.append(np.nan)
+            non_ages_set.add(a)
+
+    nums = np.array(nums)
+    return nums
+
 
 # Get all hyperparameter combinations
 def get_hp_combs(lrs, mus):
@@ -76,7 +127,38 @@ def creat_pred_file(pred: np.ndarray, filename):
     
     pred_df.to_csv(filename, index=False)
 
+def get_project_data(opts=[True, True, True, True], data_dir="../project_data/data"):
+    '''
+    Order: test, eval, train
+    Data Tuple: bow, glove, tfidf, misc
+    '''
+    data_dir_dict = dict()
+    for folder in os.listdir(data_dir):
+        # print(folder)
+        data_dir_dict[folder] = list()
+        for file_name in glob.glob(f"{data_dir}/{folder}/*.csv"):
+            # prprint(bag_of_words_k_folds)int(file_name)
+            data_dir_dict[folder].append(os.path.abspath("./") + "/" + file_name)
+            # print(os.path.abspath("./") + "/" + file_name)
 
+    # train
+    # Load data and labels
+    Y = []
+    for i in range(3):
+        t = pd.read_csv(data_dir_dict["glove"][i])
+        Y.append((t.loc[:, t.columns.isin(['label'])].to_numpy() == 1).flatten())
+        
+    bow, glove, tfidf, misc = [], [], [], []
+    for i in range(3):
+        if(opts[0]):
+            bow.append(pd.read_csv(data_dir_dict["bag-of-words"][i]))
+        if(opts[1]):
+            glove.append(pd.read_csv(data_dir_dict["glove"][i]))
+        if(opts[2]):
+            tfidf.append(pd.read_csv(data_dir_dict["tfidf"][i]))
+        if(opts[3]):
+            misc.append(pd.read_csv(data_dir_dict["misc"][-(i+1)]))
+    return (bow, glove, tfidf, misc), Y
     
 # Runs five fold CV on model.
 # def five_fold_CV(k_datasets, labels, hyperparams, e, update_fnc, lr_fnc):

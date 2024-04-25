@@ -82,17 +82,17 @@ class DecisionTree:
             gains = self.gains
         return max(gains, key=gains.get), max(gains.values())
     
-    def __add_child__(self, node, parent, child, child_idx):
+    def _add_child(self, node, parent, child, child_idx):
         node[parent][child_idx] = {child : [None]*len(self.a_dict[child])}
     
-    def __pop_max_gain__(self, gains):
+    def _pop_max_gain(self, gains):
         if(gains is self.gains):
             return self.get_max_gain()
         
         max_gain_key, _ = self.get_max_gain(gains=gains)
         return max_gain_key, gains.pop(max_gain_key)
     
-    def __ID3_iterative__(self, max_height=None):
+    def _ID3_iterative(self, max_height=None):
         
         if self.y.all() or (~self.y).all():
             self.root = self.y[0]
@@ -106,7 +106,7 @@ class DecisionTree:
         
         gains = dict(self.gains)
         
-        root, _ = self.__pop_max_gain__(gains=gains)
+        root, _ = self._pop_max_gain(gains=gains)
         root_node[root] = [None]*len(self.a_dict[root])
         max_depth = 0
         param_stack.append((root, root_node, (features, self.y.copy()), gains, 0))
@@ -123,7 +123,7 @@ class DecisionTree:
                 continue
             
             new_gains = dict(gains)
-            new_a_max, _ = self.__pop_max_gain__(gains=new_gains)
+            new_a_max, _ = self._pop_max_gain(gains=new_gains)
             for v_idx, v in enumerate(self.a_dict[a_max]):
                 
                 sv_idxs = np.where(x[:, a_names[a_max]] == v)
@@ -142,11 +142,15 @@ class DecisionTree:
                     node[a_max][v_idx] = self.common
                     continue
                     
-                self.__add_child__(node, a_max, new_a_max, v_idx)
+                self._add_child(node, a_max, new_a_max, v_idx)
                 
                 param_stack.append((new_a_max, node[a_max][v_idx], (new_x, new_y), new_gains, depth + 1))
                 
         return root_node, root, max_depth
+    
+    def _ID3(self, max_height=None):
+            
+        pass
     
     def get_tree(self) -> dict:
         return dict(self._root)
@@ -196,9 +200,9 @@ class DecisionTree:
         self.data_entropy = self.get_entropy(self.p)
         
         self.gains = self.calculate_gains(x, y)
-        self._root, self._root_name, self.depth = self.__ID3_iterative__(max_height=max_height)
+        self._root, self._root_name, self.depth = self._ID3_iterative(max_height=max_height)
     
-    def predict_label(self, features: pd.DataFrame):
+    def _predict_example(self, features: pd.DataFrame):
         
         node = self.get_tree()
         while type(node) is not bool:
@@ -215,6 +219,6 @@ class DecisionTree:
     def predict(self, x: pd.DataFrame) -> np.ndarray:
         predictions = np.zeros(shape=(x.shape[0],))
         for idx, row in x.iterrows():
-            predictions[idx] = self.predict_label(features=row)
+            predictions[idx] = self._predict_example(features=row)
         
         return predictions
