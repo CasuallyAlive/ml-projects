@@ -1,0 +1,192 @@
+\section{Experiments}\label{sec:experiments}
+
+For this question, you will have to implement and compare different learning
+strategies: SVM, logistic regression (from your answer to the previous
+question), and an ensemble that combines SVMs and decision trees.
+
+\subsection{The task and data}
+
+The data for this homework is adapted from the UCI credit card dataset. The goal
+is to predict whether a bank customer will default on their credit card
+payment. For more details about the data, see
+
+\noindent Yeh, I. C., \& Lien, C. H. (2009). {\em The comparisons of data mining
+  techniques for the predictive accuracy of probability of default of credit
+  card clients}. Expert Systems with Applications, 36(2), 2473-2480.
+
+We have transformed the original features into a collection of binary features
+and have split the data into the usual training, testing and cross-validation
+splits. The data file contains:
+
+\begin{enumerate}
+\item {\tt train.csv}: The full training set, with 20,000 examples.
+\item {\tt test.csv}: The test set, with 10,000 examples.
+\item To help with cross-validation, we have split the training set into five
+  parts {\tt training00.csv} - {\tt training04.csv} in the folder {\tt
+    CVSplits}.
+\end{enumerate}
+
+All the data files are in the same format as we have used in the previous
+homeworks: Each row is an instance, the column \texttt{label} corresponds to the
+binary label, and the remaining columns correspond to the features.
+
+\subsection{Implementation and Evaluation Notes}
+
+Each algorithm has different hyper-parameters, as described below.  Use $5$-fold
+cross-validation to identify the best hyper-parameters as you did in previous
+homeworks. Refer to the description of cross-validation in homework 1 for more
+information.
+
+An important difference between what we have seen in the previous homeworks and
+this one involves the metric that you will compute during cross-validation and
+final evaluation. The positive and negative labels are not balanced in this
+data. With such unequally distributed labels, we usually measure precision,
+recall and $F$-scores because the accuracy of a classifier could be misleading.
+
+To compute these quantities, you should count the number of true
+positives (that is, examples that your classifier predicts as
+positive and are truly positive), the false positives (i.e, examples
+that your classifier predicts as positive, but are actually labeled
+negative) and the false negatives (i.e., examples that are predicted
+as negative by your classifier, but are actually positive).
+
+Denote true positives, false positive and false negative as $TP$, $FP$
+and $FN$ respectively. The precision ($p$), recall ($r$) and f-value
+$F_1$ are defined as:
+\begin{align*}
+  p    =  \frac{TP}{TP + FP} \hspace{1in}
+  r    =  \frac{TP}{TP+FN}   \hspace{1in}
+  F_1  =  2 \frac{p \cdot r}{p + r} 
+\end{align*}
+
+(Sidenote: The $F_1$ score is defined to be the harmonic mean of the precision
+and the recall. That is, it is defined to be the number such that
+$\frac{2}{F_1} = \frac{1}{p} + \frac{1}{r}$. Reorganizing this gives us the
+expression above.)
+
+For all your classifiers, you should report measure precision,
+recall and $F_1$. During cross-validation, use the average $F_1$
+instead of average accuracy.
+
+ 
+
+\subsection{Algorithms to Compare}
+
+\begin{enumerate}
+\item~[30 points] \textbf{Support Vector Machine}
+
+  Implement the stochastic sub-gradient descent version algorithm SVM as
+  described in the class. Assume that the learning rate for the $t^{th}$ epoch
+  is
+
+  $$\gamma_t = \frac{\gamma_0}{1 + t}$$
+
+  For this, and all subsequent implementations, you should choose an appropriate
+  number of epochs and justify your choice. One way to select the number of
+  epochs is to observe the value of the SVM objective over the epochs and stop
+  if the change in the value is smaller than some small threshold. You do not
+  have to use this strategy, but your report should specify the number of epochs
+  you chose.
+
+  \textbf{Hyper-parameters}: 
+  \begin{enumerate}
+  \item Initial learning rate: $\gamma_0\in\{10^0, 10^{-1}, 10^{-2}, 10^{-3}, 10^{-4}\}$
+  \item The regularization/loss tradeoff parameter: $C\in \{10^1, 10^0, 10^{-1}, 10^{-2}, 10^{-3}, 10^{-4}\}$
+  \end{enumerate}
+
+  
+\item~[30 points] \textbf{Logistic regression}
+
+  Implement the Logistic Regression learner based on your algorithm in the
+  Question~\ref{sec:logistic-regression}.
+
+  \textbf{Hyper-parameters}: 
+  \begin{enumerate}
+  \item Initial learning rate: $\gamma_0\in\{10^0, 10^{-1}, 10^{-2}, 10^{-3}, 10^{-4}, 10^{-5}\}$
+  \item Tradeoff: $\sigma^2\in \{10^{-1}, 10^0, 10^{1}, 10^{2}, 10^{3}, 10^{4}\}$
+  \end{enumerate}
+
+\item~[30 points, Extra credit] \textbf{SVM over trees}
+
+  In class, we saw how the bagging and random forest algorithms work.  In this
+  setting, you are going to build a different ensemble over depth-limited
+  decision trees that are learned using the ID3 algorithm.
+
+  First, using the training set, you need to build $100$ decision trees. To
+  construct a decision tree, you need to sample $10\%$ of the examples {\em with
+    replacement} from the training set (i.e. 1000 examples), and use this subset
+  to train your decision tree with a depth limit $d$. Repeating this $100$ times
+  will get you $100$ trees.
+
+  Usually, the final prediction will be voted on by these trees. However, we
+  would like to train an SVM to combine these predictions. To do so, you should
+  treat the $100$ trees as a \emph{learned} feature transformation and construct
+  a new dataset by applying the transformation. That is, suppose your trees were
+  $tree_1, tree_2, \cdots, tree_{100}$. Each of these are functions that can
+  predict a label for an example that is either $-1$ or $+1$. Instead of just
+  predicting the label, treat them as a feature transformation $\phi(x)$ that is
+  defined as:
+
+  
+  $$\phi(x) = [tree_1(x), tree_2(x), \cdots, tree_{N} (x)]$$  
+
+  In other words, you will build an $N=100$ dimensional vector consisting of the
+  prediction (1 or -1) of each tree that you created. Thus, you have a {\em
+    learned} feature transformation.
+
+  Now, you can train an SVM on these transformed features.  (Don't forget to
+  transform the test set before making your final evaluations.)
+
+  \textbf{Hyper-parameters}:
+  \begin{enumerate}
+  \item Initial learning rate $\gamma_0 \in\{10^0, 10^{-1}, 10^{-2}, 10^{-3}, 10^{-4}, 10^{-5}\}$
+  \item Tradeoff $C \in \{10^0, 10^{-1}, 10^{-2}, 10^{-3}, 10^{-4}, 10^{-5}\}$
+  \item Depth limit: $d \in \{5, 10\}$
+  \end{enumerate}
+
+
+\end{enumerate}
+
+
+\subsection{What to report}
+
+\begin{enumerate}
+\item For each algorithm above, briefly describe the design decisions that you
+  have made in your implementation. (E.g, what programming language, how do you
+  represent the vectors, trees, etc.)
+
+
+\item Report the best hyper-parameters, the average precision,
+  recall and $F_1$ achieved by those hyperparameters during
+  cross-validation and the precision/recall/$F_1$ on the test
+  set. You can use the table \ref{tb} as a template for your reporting.
+
+  \begin{table}[]
+    \centering
+    \scriptsize
+    \begin{tabular}{rccc}
+      \toprule 
+                          & Best hyper-parameters & Average Cross-validation P/R/F1 & Test P/R/F1 \\\midrule
+      SVM                 &                       &                                 &             \\
+      Logistic regression &                       &                                 &             \\
+      SVM over trees (optional)      &                       &                                 &             \\
+      \bottomrule
+    \end{tabular}
+    \caption{Results table}\label{tb}
+  \end{table}
+
+  
+\item For the algorithms that involve minimizing loss, show a plot of the
+  corresponding loss function at each epoch. For the SVM over trees, you should
+  plot the loss function for the SVM.
+
+  (Note that to get this plot, you should compute the loss at the end of each
+  epoch over the entire training set. This requires a second pass over the
+  training data that is different from the weight update loop.)
+
+\end{enumerate}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "hw6"
+%%% End:

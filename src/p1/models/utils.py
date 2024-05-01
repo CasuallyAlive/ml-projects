@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from typing import Union
 from word2number.w2n import word_to_num
-
+h = ""
 def load_data(labels, null='?', dir=r"data/"):
     data = pd.read_csv(dir)
     
@@ -67,7 +67,7 @@ def get_null_columns(x: pd.DataFrame, null='?'):
     temp = (x == null).idxmax(axis=0)
     return list(temp.index[temp > 0])
 
-def get_attr_nums(data: pd.DataFrame, attr_id: str, uk:str):
+def get_attr_nums(data: pd.DataFrame, attr_id: str, uk:str, unknown='nan'):
     x = get_data_col(data, attr_id)
 
     dlen = len(x)
@@ -78,20 +78,29 @@ def get_attr_nums(data: pd.DataFrame, attr_id: str, uk:str):
     for i in range(dlen):
         a = x[i][0].strip(' ')
         # print(a)
-        if a == uk: nums.append(np.nan)
+        if a == uk:
+            if unknown=='nan':
+                nums.append(np.nan)
+            else:
+                nums.append(-1)
         elif str.isdigit(a): 
             num = int(a)        
             nums.append(num)
         elif get_num(re.sub("[^\w]", " ", a).split()):
             num = get_num(re.sub("[^\w]", " ", a).split())        
             nums.append(num)
-        else: 
-            nums.append(np.nan)
+        else:
+            if unknown=='nan':
+                nums.append(np.nan)
+            else:
+                nums.append(-1)
             non_ages_set.add(a)
 
     nums = np.array(nums)
     return nums
 
+def normalize(X, axis=0):
+    return (X-X.min(axis=axis)) / (X.max(axis=axis) - X.min(axis=axis))
 
 # Get all hyperparameter combinations
 def get_hp_combs(lrs, mus):
@@ -151,11 +160,11 @@ def get_project_data(opts=[True, True, True, True], data_dir="../project_data/da
     bow, glove, tfidf, misc = [], [], [], []
     for i in range(3):
         if(opts[0]):
-            bow.append(pd.read_csv(data_dir_dict["bag-of-words"][i]))
+            bow.append(load_data(labels=[1, 0], dir=data_dir_dict["bag-of-words"][i])[0])
         if(opts[1]):
-            glove.append(pd.read_csv(data_dir_dict["glove"][i]))
+            glove.append(load_data(labels=[1, 0], dir=data_dir_dict["glove"][i])[0])
         if(opts[2]):
-            tfidf.append(pd.read_csv(data_dir_dict["tfidf"][i]))
+            tfidf.append(load_data(labels=[1, 0], dir=data_dir_dict["tfidf"][i])[0])
         if(opts[3]):
             misc.append(pd.read_csv(data_dir_dict["misc"][-(i+1)]))
     return (bow, glove, tfidf, misc), Y

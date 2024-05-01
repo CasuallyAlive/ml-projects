@@ -1,0 +1,71 @@
+\section{Logistic Regression}\label{sec:logistic-regression}
+
+We saw Maximum A Posteriori (MAP) learning of the logisitic regression
+classifier in class.  In particular, we showed that learning the classifier is
+equivalent to the following optimization problem:
+
+\begin{equation*}
+    \min_{\bw}\sum\limits_{i=1}^m \log(1+\exp(-y_i \bw^{T}\bx_i))+\frac{1}{\sigma^2}\bw^T \bw
+\end{equation*}
+
+In this question, you will derive the stochastic gradient descent algorithm for
+the logistic regression classifier.
+
+\begin{enumerate}
+\item~[5 points] What is the derivative of the function
+  $g(\bw)=\log(1+\exp(-y_i \bw^T\bx_i))$ with respect to the weight vector? Your
+  answer should be a vector whose dimensionality is the same as $\bw$.
+	
+	\textbf{Response:} \hspace{3cm} $\frac{\partial g(\textbf{w})}{\partial \textbf{w}} = \frac{\partial}{\partial \textbf{w}} log(1+exp(-y_i \textbf{w}^T \textbf{x}_i))$ \newline
+	
+	\hspace{5cm} Let $z = -y_i \textbf{w}^T \textbf{x}_i$ and $u = 1+exp(z)$.
+	
+	\hspace{5cm} So, \hspace{1cm} $\frac{\partial g(\textbf{w})}{\partial \textbf{w}} = \frac{\partial}{\partial \textbf{w}} log(u)$
+	
+	\hspace{8cm} = $\frac{1}{u} \frac{\partial}{\partial \textbf{w}} (1+exp(z))$
+	
+	\hspace{8cm} = $\frac{-y_i \textbf{x}_i exp(z)}{1+exp(z)}$
+	
+\item~[5 points] The inner most step in the SGD algorihtm is the gradient update
+  where we use a single randomly chosen example instead of the entire dataset to
+  compute a stochastic estimate of the gradient.  Write down the objective where
+  the entire dataset is composed of a single example, say $(\bx_i, y_i)$.
+
+	\textbf{Response:} For a single example $(\bx_i, y_i)$, the objective function is the negative logarithm of the likelihood function. 
+	$$J(\textbf{w}) = -\L(\textbf{w}) = -(y_i log(P(y_i = +1 | \textbf{x}_i;\textbf{w}))+(1-y_i)log(1-P(y_i = +1 | \textbf{x}_i;\textbf{w})))$$
+	
+	\hspace{4cm} Where, $P(y_i = +1 | \textbf{x}_i;\textbf{w}) = \frac{1}{1+exp(z)}$
+
+\item\relax[5 points] Derive the gradient of the SGD objective for a single
+  example (from the previous question) with respect to the weight vector.
+	
+	\textbf{Response:} $\frac{\partial J(\textbf{w})}{\partial \textbf{w}} = -\frac{\partial}{\partial \textbf{w}} (y_i log(P(y_i = +1 | \textbf{x}_i;\textbf{w}))+(1-y_i)log(1-P(y_i = +1 | \textbf{x}_i;\textbf{w})))$
+	
+	\hspace{5cm} = $\textbf{x}_i (y_i-P(y_i = +1 | \textbf{x}_i;\textbf{w}))$
+	
+\item~[15 points] Write down the pseudo code for the stochastic gradient
+  algorithm using the gradient from previous part.
+
+  Hint: The answer to this question will be an algorithm that is similar to the
+  SGD based learner we developed in the class for SVMs.
+  
+  \textbf{Response:} \newline
+  
+  Given a training set $S$ = {($\textbf{x}_i, y_i$)}, $\textbf{x}_i \in \Re ^d$, $y \in \{-1, +1\}$
+  \begin{enumerate}
+
+  \item[1.]~Init \textbf{w} = 0
+  \item[2.]~For epoch = 1...T:
+  	\begin{enumerate}
+	  	\item[1.]~Get rand example ($\textbf{x}_i, y_i$) in S
+	 	\item[2.]~Treat ($\textbf{x}_i, y_i$) as a full dataset and take derivative of objective $J(\textbf{w})$ at $\textbf{w}^{t-1}$
+	 	\item[3.]~Update $\textbf{w}^t = \textbf{w}^{t-1}-\gamma \Delta J(\textbf{w}^{t-1})$
+ 	\end{enumerate}
+  \item[3.]~Return $\textbf{w}$ 
+  \end{enumerate}
+\end{enumerate}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "hw6"
+%%% End:
