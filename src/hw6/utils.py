@@ -13,6 +13,14 @@ def calc_recall(tp, fn):
 def calc_f1(p, r):
     return 2*((p*r) / (p+r))
 
+def get_prediction_errors(y, y_pred):
+    tp = np.sum((y_pred == 1) & (y == 1))
+    tn = np.sum((y_pred == 0) & (y == 0))
+    fp = np.sum((y_pred == 1) & (y == 0))
+    fn = np.sum((y_pred == 0) & (y == 1))
+    
+    return tp, fp, fn, tn
+
 def load_data(labels, null='?', dir=r"data/"):
     data = pd.read_csv(dir)
     
